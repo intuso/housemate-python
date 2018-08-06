@@ -17,9 +17,9 @@ class RealObject:
 
 class RealCommand(RealObject):
 
-    def __init__(self, parent,id, name, description, command_callback):
-        RealObject.__init__(self, parent.conn, parent.path + '.' + id,
-                            Data('command', 'command', id, name, description))
+    def __init__(self, parent, object_id, name, description, command_callback):
+        RealObject.__init__(self, parent.conn, parent.path + '.' + object_id,
+                            Data('command', 'command', object_id, name, description))
         self.parameters = RealList(self, 'parameters', 'Parameters', 'Parameters')
         self.command_callback = command_callback
         self.conn.register(self.path + '.perform', self.perform, dict_to_perform)
@@ -34,52 +34,52 @@ class RealCommand(RealObject):
         status.perform_finished()
         self.conn.send(self.path + '.performStatus', status, persist=False)
 
-    def add_parameter(self, id, name, description, parameter_type):
-        parameter = RealParameter(self.parameters, id, name, description, parameter_type)
+    def add_parameter(self, object_id, name, description, parameter_type):
+        parameter = RealParameter(self.parameters, object_id, name, description, parameter_type)
         self.parameters.add(parameter)
         return parameter
 
 
 class RealDeviceConnected(RealObject):
 
-    def __init__(self, parent,id, name, description, abilities, classes):
-        RealObject.__init__(self, parent.conn, parent.path + '.' + id,
-                            DeviceConnectedData('deviceConnected', 'device-connected', id, name, description,
+    def __init__(self, parent, object_id, name, description, abilities, classes):
+        RealObject.__init__(self, parent.conn, parent.path + '.' + object_id,
+                            DeviceConnectedData('deviceConnected', 'device-connected', object_id, name, description,
                                                 [name for ability in abilities for name in ability.names()], classes))
         self.commands = RealList(self, 'commands', 'Commands', 'Commands')
         self.values = RealList(self, 'values', 'Values', 'Values')
         for ability in abilities:
             ability.configure(self)
 
-    def add_command(self, id, name, description, command_callback):
-        command = RealCommand(self.commands, id, name, description, command_callback)
+    def add_command(self, object_id, name, description, command_callback):
+        command = RealCommand(self.commands, object_id, name, description, command_callback)
         self.commands.add(command)
         return command
 
-    def add_value(self, id, name, description, value_type):
-        value = RealValue(self.values, id, name, description, value_type)
+    def add_value(self, object_id, name, description, value_type):
+        value = RealValue(self.values, object_id, name, description, value_type)
         self.values.add(value)
         return value
 
 
 class RealHardware(RealObject):
 
-    def __init__(self, parent,id, name, description):
-        RealObject.__init__(self, parent.conn, parent.path + '.' + id,
-                            Data('hardware', 'hardware', id, name, description))
+    def __init__(self, parent, object_id, name, description):
+        RealObject.__init__(self, parent.conn, parent.path + '.' + object_id,
+                            Data('hardware', 'hardware', object_id, name, description))
         self.devices = RealList(self, 'devices', 'Devices', 'Devices')
 
-    def add_device_connected(self, id, name, description, abilities, classes):
-        device = RealDeviceConnected(self.devices, id, name, description, abilities, classes)
+    def add_device_connected(self, object_id, name, description, abilities, classes):
+        device = RealDeviceConnected(self.devices, object_id, name, description, abilities, classes)
         self.devices.add(device)
         return device
 
 
 class RealList(RealObject):
 
-    def __init__(self, parent,id, name, description):
-        RealObject.__init__(self, parent.conn, parent.path + '.' + id,
-                            Data('list', 'list', id, name, description))
+    def __init__(self, parent, object_id, name, description):
+        RealObject.__init__(self, parent.conn, parent.path + '.' + object_id,
+                            Data('list', 'list', object_id, name, description))
         self.elements = []
 
     def add(self, element):
@@ -88,30 +88,30 @@ class RealList(RealObject):
 
 class RealNode(RealObject):
 
-    def __init__(self, conn, id, name, description):
-        RealObject.__init__(self, conn, '/topic/real.1-0.json.nodes.' + id,
-                            Data('node', 'node', id, name, description))
+    def __init__(self, conn, object_id, name, description):
+        RealObject.__init__(self, conn, '/topic/real.1-0.json.nodes.' + object_id,
+                            Data('node', 'node', object_id, name, description))
         self.hardwares = RealList(self, 'hardwares', 'Hardwares', 'Hardwares')
 
-    def add_hardware(self, id, name, description):
-        hardware = RealHardware(self.hardwares, id, name, description)
+    def add_hardware(self, object_id, name, description):
+        hardware = RealHardware(self.hardwares, object_id, name, description)
         self.hardwares.add(hardware)
         return hardware
 
 
 class RealParameter(RealObject):
 
-    def __init__(self, parent,id, name, description, parameter_type):
-        RealObject.__init__(self, parent.conn, parent.path + '.' + id,
-                            Data('value', 'value', id, name, description))
+    def __init__(self, parent, object_id, name, description, parameter_type):
+        RealObject.__init__(self, parent.conn, parent.path + '.' + object_id,
+                            Data('value', 'value', object_id, name, description))
         self.parameter_type = parameter_type
 
 
 class RealValue(RealObject):
 
-    def __init__(self, parent,id, name, description, value_type):
-        RealObject.__init__(self, parent.conn, parent.path + '.' + id,
-                            Data('value', 'value', id, name, description))
+    def __init__(self, parent, object_id, name, description, value_type):
+        RealObject.__init__(self, parent.conn, parent.path + '.' + object_id,
+                            Data('value', 'value', object_id, name, description))
         self.value_type = value_type
 
     def set(self, value):

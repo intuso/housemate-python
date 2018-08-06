@@ -88,18 +88,18 @@ class HMConnection:
 # object_class (basically same as type but a property of the resulting deserialised object), id, name and description
 class Data:
 
-    def __init__(self, subtype, object_class, id, name, description):
+    def __init__(self, subtype, object_class, object_id, name, description):
         self._type = subtype
         self.object_class = object_class
-        self.id = id
+        self.id = object_id
         self.name = name
         self.description = description
 
 
 class DeviceConnectedData(Data):
 
-    def __init__(self, subtype, object_class, id, name, description, abilities, classes):
-        Data.__init__(self, subtype, object_class, id, name, description)
+    def __init__(self, subtype, object_class, object_id, name, description, abilities, classes):
+        Data.__init__(self, subtype, object_class, object_id, name, description)
         self.abilities = abilities
         self.classes = classes
 
@@ -159,13 +159,11 @@ class PrimitiveType(Type):
         Type.__init__(self)
         self.parse = parse
 
-
     def to_value(self, instances):
         return self.parse(instances[0]['value']) if isinstance(instances, list) and len(instances) > 0 else None
 
-
     def from_value(self, value):
-        return [{"value" : str(value)}] # temp fix while HM UI is case sensitive
+        return [{"value": str(value)}]  # temp fix while HM UI is case sensitive
 
 
 class BooleanType(PrimitiveType):
@@ -200,4 +198,4 @@ class StringType(PrimitiveType):
 
 # Methods to create objects from json parsed into a dict
 def dict_to_perform(json_dict):
-    return None if json_dict == None else Perform(json_dict['opId'], json_dict['instanceMap'])
+    return None if json_dict is None else Perform(json_dict['opId'], json_dict['instanceMap'])
